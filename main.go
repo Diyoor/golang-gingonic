@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/maxdev/go-gingonic/usecase"
 
 	"github.com/maxdev/go-gingonic/entity"
@@ -26,4 +28,15 @@ func main() {
 	}
 
 	fmt.Println("res >", res)
+
+	server := gin.Default()
+
+	server.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  http.StatusOK,
+			"message": "Hello GIN",
+		})
+	})
+
+	server.Run(":3001")
 }

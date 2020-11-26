@@ -17,7 +17,7 @@ func NewRepo() TodoRepoInterface {
 func (t *TodoRepoInterface) AddTodo(todo *entity.Todo) (id int64, err error) {
 
 	if len(t.Todos) == 0 {
-		todo.Id = 1
+		todo.Id = 0
 	} else {
 		todo.Id = t.Todos[len(t.Todos)-1].Id + 1
 	}
