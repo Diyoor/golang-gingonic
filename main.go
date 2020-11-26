@@ -1,40 +1,42 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-	"github.com/maxdev/go-gingonic/usecase"
-
+	"github.com/maxdev/go-gingonic/dto"
 	"github.com/maxdev/go-gingonic/entity"
 	"github.com/maxdev/go-gingonic/repository"
+	"github.com/maxdev/go-gingonic/usecase"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	repo := repository.NewRepo()
-	uc := usecase.NewUsecase(repo)
-
-	newData := entity.Todo{
-		Content: "data",
-		Title:   "title",
-	}
-
-	res, err := uc.AddTodo(&newData)
-
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	fmt.Println("res >", res)
+	repo := repository.CreateRepository()
+	uc := usecase.CreateTodoUsecase(repo)
 
 	server := gin.Default()
 
 	server.GET("/", func(c *gin.Context) {
+
+		var newData dto.AddTodo
+
+		if err := c.ShouldBindJSON(&newData); err != nil {
+			c.JSON(200, gin.H{
+				"erroro": err,
+			})
+			return
+		}
+
+		saveTodo := entity.Todo{
+			Content: newData.Content,
+			Title:   newData.Title,
+		}
+
+		res, _ := uc.AddTodo(&saveTodo)
+
 		c.JSON(200, gin.H{
-			"status":  http.StatusOK,
-			"message": "Hello GIN",
+			"data": newData,
+			"id":   res,
 		})
 	})
 
