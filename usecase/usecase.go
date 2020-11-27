@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/maxdev/go-gingonic/entity"
 	"github.com/maxdev/go-gingonic/repository"
@@ -27,26 +26,11 @@ func (uc *TodoUsecase) AddTodo(todo *entity.Todo) (int64, error) {
 	return id, nil
 }
 
-func (uc *TodoUsecase) GetTodos() []entity.Todo {
-	data := uc.repo.GetTodos()
-	return data
+func (uc *TodoUsecase) GetTodos() ([]entity.Todo, error) {
+	data, err := uc.repo.GetTodos()
+	return data, err
 }
 func (uc *TodoUsecase) UpdateTodo(id int64, todo *entity.Todo) (entity.Todo, error) {
-
-	// var req entity.Todo
-
-	// oldData := uc.repo.GetTodos()
-
-	// for _, data := range oldData {
-	// 	if data.Id == id {
-	// 		req = data
-
-	// 		fmt.Println(data)
-	// 	}
-	// }
-
-	fmt.Println(id)
-	fmt.Println(todo)
 
 	data, err := uc.repo.UpdateTodo(id, todo)
 

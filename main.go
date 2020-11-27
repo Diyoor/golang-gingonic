@@ -26,7 +26,15 @@ func main() {
 
 		c.ShouldBindJSON(&newData)
 
-		res := uc.GetTodos()
+		res, err := uc.GetTodos()
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"errors": err.Error(),
+			})
+
+			return
+		}
 
 		c.JSON(200, gin.H{
 			"data": res,
@@ -58,7 +66,7 @@ func main() {
 
 	})
 
-	server.PUT("/:id", func(c *gin.Context) {
+	server.PATCH("/:id", func(c *gin.Context) {
 		id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
 		var reqUpd dto.UpdateTodo
@@ -66,11 +74,19 @@ func main() {
 		c.ShouldBindJSON(&reqUpd)
 
 		data := entity.Todo{
-			Id:     id,
-			IsDone: reqUpd.IsDone,
+			Title:   reqUpd.Title,
+			Content: reqUpd.Content,
+			IsDone:  reqUpd.IsDone,
 		}
 
-		res, _ := uc.UpdateTodo(id, &data)
+		res, err := uc.UpdateTodo(id, &data)
+
+		if err != nil {
+			c.JSON(400, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 
 		c.JSON(200, gin.H{
 			"res": res,

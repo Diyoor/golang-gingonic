@@ -1,5 +1,7 @@
 package dto
 
 type UpdateTodo struct {
-	IsDone bool `json:"IsDone"`
+	Title   string `json:"Title"`
+	Content string `json:"Content"`
+	IsDone  bool   `json:"IsDone"`
 }
