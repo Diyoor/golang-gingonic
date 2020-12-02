@@ -3,6 +3,8 @@ package main
 import (
 	"strconv"
 
+	"github.com/maxdev/go-gingonic/pkg/database"
+
 	"github.com/maxdev/go-gingonic/dto"
 	"github.com/maxdev/go-gingonic/entity"
 	"github.com/maxdev/go-gingonic/repository"
@@ -14,22 +16,18 @@ import (
 )
 
 func main() {
-
-	repo := repository.CreateRepository()
+	database.InitDB()
+	repo := repository.CreateRepositoryInDB(database.DB)
 	uc := usecase.CreateTodoUsecase(repo)
 
 	server := gin.Default()
 
 	server.GET("/", func(c *gin.Context) {
 
-		var newData dto.GetTodos
-
-		c.ShouldBindJSON(&newData)
-
 		res, err := uc.GetTodos()
 
 		if err != nil {
-			c.JSON(200, gin.H{
+			c.JSON(400, gin.H{
 				"errors": err.Error(),
 			})
 
@@ -54,7 +52,7 @@ func main() {
 
 		if err != nil {
 			c.JSON(400, gin.H{
-				"error": err,
+				"error": err.Error(),
 			})
 
 			return

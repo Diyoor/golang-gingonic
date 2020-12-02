@@ -1,8 +1,6 @@
 package usecase
 
 import (
-	"errors"
-
 	"github.com/maxdev/go-gingonic/entity"
 	"github.com/maxdev/go-gingonic/repository"
 )
@@ -20,7 +18,7 @@ func (uc *TodoUsecase) AddTodo(todo *entity.Todo) (int64, error) {
 	id, err := uc.repo.AddTodo(todo)
 
 	if err != nil {
-		return 0, errors.New("Invalid Data !")
+		return 0, err
 	}
 
 	return id, nil
