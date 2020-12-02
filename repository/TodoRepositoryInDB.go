@@ -71,7 +71,7 @@ func (tr todoRepositotyInDB) GetTodos() ([]entity.Todo, error) {
 func (tr todoRepositotyInDB) UpdateTodo(id int64, todo *entity.Todo) (entity.Todo, error) {
 	var emptyTodo entity.Todo
 
-	stmt, err := tr.DB.Prepare("SELECT * FROM todo as t WHERE t.ID = ?")
+	stmt, err := tr.DB.Prepare("UPDATE todo SET CONTENT  = ?, TITLE = ? ,IS_DONE = ? WHERE `todo`.`ID` = ?")
 	if err != nil {
 		return emptyTodo, errors.New("E")
 	}
@@ -84,13 +84,6 @@ func (tr todoRepositotyInDB) UpdateTodo(id int64, todo *entity.Todo) (entity.Tod
 	fmt.Println(result)
 
 	return emptyTodo, nil
-
-	// if err != nil {
-	// 	return nil, errors.New("Can't Add todo")
-	// }
-	// defer stmt.Close()
-
-	panic("Implement")
 }
 
 func (tr todoRepositotyInDB) DeleteTodo(id int64) (string, error) {
