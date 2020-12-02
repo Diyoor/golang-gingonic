@@ -72,6 +72,7 @@ func (tr todoRepositotyInDB) UpdateTodo(id int64, todo *entity.Todo) (entity.Tod
 	var emptyTodo entity.Todo
 
 	stmt, err := tr.DB.Prepare("UPDATE todo SET CONTENT  = ?, TITLE = ? ,IS_DONE = ? WHERE `todo`.`ID` = ?")
+
 	if err != nil {
 		return emptyTodo, errors.New("E")
 	}
