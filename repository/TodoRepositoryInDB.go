@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
+
+	"github.com/gobeam/stringy"
 
 	"github.com/maxdev/go-gingonic/entity"
 )
@@ -68,21 +71,37 @@ func (tr todoRepositotyInDB) GetTodos() ([]entity.Todo, error) {
 	return response, nil
 }
 
-func (tr todoRepositotyInDB) UpdateTodo(id int64, todo *entity.Todo) (entity.Todo, error) {
+func (tr todoRepositotyInDB) UpdateTodo(id int64, todo map[string]interface{}) (entity.Todo, error) {
+
 	var emptyTodo entity.Todo
 
-	stmt, err := tr.DB.Prepare("UPDATE todo SET CONTENT  = ?, TITLE = ? ,IS_DONE = ? WHERE `todo`.`ID` = ?")
+	attr := make([]string, 0, len(todo))
+
+	for key, value := range todo {
+		key := stringy.New(key)
+
+		snakeValue := fmt.Sprint(key.SnakeCase("?", "").ToUpper())
+
+		attr = append(attr, snakeValue+"="+fmt.Sprintf("'%v'", value))
+	}
+
+	attrJoin := fmt.Sprint(strings.Join(attr, ", "))
+
+	sql := "UPDATE todo SET " + attrJoin + " WHERE todo.ID = ?"
+
+	fmt.Println(sql)
+
+	stmt, err := tr.DB.Prepare(sql)
 
 	if err != nil {
-		return emptyTodo, errors.New("E")
-	}
-	result, err := stmt.Exec(id)
-
-	if err != nil {
-		return emptyTodo, errors.New("A")
+		return emptyTodo, errors.New("SQL COMMAND ERROR")
 	}
 
-	fmt.Println(result)
+	_, errstmt := stmt.Exec(id)
+
+	if errstmt != nil {
+		return emptyTodo, errors.New("ERROR CAN'T EXCUTE COMMAND")
+	}
 
 	return emptyTodo, nil
 }
@@ -104,4 +123,29 @@ func (tr todoRepositotyInDB) DeleteTodo(id int64) (string, error) {
 	fmt.Println(result)
 
 	return "ลบได้และ", nil
+}
+
+func (tr todoRepositotyInDB) GetByID(id int64) (entity.Todo, error) {
+
+	sql := "SELECT * FROM todo WHERE ID = " + fmt.Sprint(id)
+
+	row := tr.DB.QueryRow(sql)
+
+	var todo entity.Todo
+
+	err := row.Scan(
+		&todo.Id,
+		&todo.Title,
+		&todo.Content,
+		&todo.IsDone,
+		&todo.CreateAt,
+	)
+
+	if err != nil {
+		return entity.Todo{}, errors.New("Not found ID")
+	}
+
+	fmt.Println(todo)
+
+	return todo, nil
 }

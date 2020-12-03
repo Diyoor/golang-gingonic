@@ -67,17 +67,11 @@ func main() {
 	server.PATCH("/:id", func(c *gin.Context) {
 		id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
-		var reqUpd dto.UpdateTodo
+		var reqUpd map[string]interface{}
 
 		c.ShouldBindJSON(&reqUpd)
 
-		data := entity.Todo{
-			Title:   reqUpd.Title,
-			Content: reqUpd.Content,
-			IsDone:  reqUpd.IsDone,
-		}
-
-		res, err := uc.UpdateTodo(id, &data)
+		res, err := uc.UpdateTodo(id, reqUpd)
 
 		if err != nil {
 			c.JSON(400, gin.H{
@@ -96,7 +90,15 @@ func main() {
 
 		id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
-		res, _ := uc.DeleteTodo(id)
+		res, err := uc.DeleteTodo(id)
+
+		if err != nil {
+			c.JSON(400, gin.H{
+				"error": err.Error(),
+			})
+
+			return
+		}
 
 		c.JSON(200, gin.H{
 			"res": res,

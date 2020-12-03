@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"errors"
+
 	"github.com/maxdev/go-gingonic/entity"
 	"github.com/maxdev/go-gingonic/repository"
 )
@@ -28,14 +30,27 @@ func (uc *TodoUsecase) GetTodos() ([]entity.Todo, error) {
 	data, err := uc.repo.GetTodos()
 	return data, err
 }
-func (uc *TodoUsecase) UpdateTodo(id int64, todo *entity.Todo) (entity.Todo, error) {
+func (uc *TodoUsecase) UpdateTodo(id int64, todo map[string]interface{}) (entity.Todo, error) {
+	_, err := uc.repo.GetByID(id)
 
-	data, err := uc.repo.UpdateTodo(id, todo)
+	if err != nil {
+		return entity.Todo{}, errors.New("CAN'T FIND ID")
+	} else {
+		data, err := uc.repo.UpdateTodo(id, todo)
+		return data, err
+	}
 
-	return data, err
 }
 
 func (uc *TodoUsecase) DeleteTodo(id int64) (string, error) {
-	data, err := uc.repo.DeleteTodo(id)
-	return data, err
+
+	_, err := uc.repo.GetByID(id)
+
+	if err != nil {
+		return "", errors.New("CAN'T FIND ID")
+	} else {
+		data, err := uc.repo.DeleteTodo(id)
+		return data, err
+	}
+
 }
